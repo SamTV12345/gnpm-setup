@@ -29,7 +29,7 @@ const main = async () => {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists.`);
         }
         try {
-            symlinkSync(gnpmPath, actualInstallPath)
+            symlinkSync(actualInstallPath, gnpmPath)
         } catch (err: any) {
             setFailed(`Failed to create symlink for gnpm version ${version}.` + err.toString());
         }
