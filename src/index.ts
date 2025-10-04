@@ -1,12 +1,26 @@
-import {setFailed, saveState, getInput} from '@actions/core'
-import {createReadStream, existsSync, symlinkSync, writeFileSync, copyFileSync} from 'node:fs'
+import {setFailed, saveState, getInput, addPath} from '@actions/core'
+import {createReadStream, existsSync, symlinkSync, writeFileSync, mkdirSync, copyFileSync} from 'node:fs'
 import tar from 'tar-fs'
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-const gnpmPath = '/usr/local/bin/gnpm';
-import { createGunzip } from 'node:zlib';
+let gnpmPath: PathLike;
+
+if (process.platform === 'win32') {
+    gnpmPath = 'C:\\gnpm\\gnpm.exe';
+    if (!existsSync('C:\\gnpm')) {
+        mkdirSync('C:\\gnpm');
+    }
+    addPath('C:\\gnpm');
+} else {
+    gnpmPath = '/usr/local/bin/gnpm';
+}
+
+
+import {createGunzip} from 'node:zlib';
+import { PathLike } from "fs";
 
 const version = getInput('version', {required: true});
+
 
 
 const main = async () => {
