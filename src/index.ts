@@ -1,5 +1,5 @@
 import {setFailed, saveState, getInput} from '@actions/core'
-import {existsSync, writeFileSync} from 'node:fs'
+import {existsSync, symlinkSync, writeFileSync} from 'node:fs'
 
 const gnpmPath = '/usr/local/bin/gnpm';
 
@@ -25,6 +25,7 @@ const main = async () => {
             saveState('gnpmPath', gnpmPath);
             const actualInstallPath = gnpmPath + `-${version}`
             writeFileSync(actualInstallPath, buffer)
+            symlinkSync(gnpmPath, actualInstallPath)
         } catch (err) {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists.`);
         }
