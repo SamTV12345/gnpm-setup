@@ -9,7 +9,8 @@ const version = getInput('version', {required: true});
 
 const main = async () => {
     const arch = process.arch === 'x64' ? 'amd64' : process.arch;
-    const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${process.platform}_${arch}.tar.gz`
+    const platform = process.platform === 'win32' ? 'windows' : process.platform;
+    const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${platform}_${arch}.tar.gz`
     const tarFileLocation = "/tmp/gnpm.tar.gz"
     const tarFileTargetLocation = "/tmp/gnpmTarget"
     const actualInstallPath = gnpmPath + `-${version}`
