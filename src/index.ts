@@ -10,15 +10,16 @@ const version = getInput('version', {required: true});
 const main = async () => {
     const arch = process.arch === 'x64' ? 'amd64' : process.arch;
     const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${process.platform}_${arch}.tar.gz`
-    console.log('Fetching gnpm version from', link);
     const tarFileLocation = "/tmp/gnpm.tar.gz"
     const tarFileTargetLocation = "/tmp/gnpmTarget"
     const actualInstallPath = gnpmPath + `-${version}`
 
-    if (existsSync(gnpmPath)) {
+    if (existsSync(actualInstallPath)) {
+        console.log("Using cached gnpm binary")
         saveState('gnpmPath', gnpmPath);
     } else {
         try {
+            console.log('Fetching gnpm version from', link);
             const gnpmBinary =  await fetch(link)
             if (!gnpmBinary.ok) {
                 setFailed('Failed to fetch gnpm binary. Please check if the version exists.');
