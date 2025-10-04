@@ -10,6 +10,7 @@ const main = async () => {
     const arch = process.arch === 'x64' ? 'amd64' : process.arch;
     const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${process.platform}_${arch}.tar.gz`
     console.log('Fetching gnpm version from', link);
+    const actualInstallPath = gnpmPath + `-${version}`
 
     if (existsSync(gnpmPath)) {
         saveState('gnpmPath', gnpmPath);
@@ -23,11 +24,14 @@ const main = async () => {
             const arrayBuffer = await gnpmBinary.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             saveState('gnpmPath', gnpmPath);
-            const actualInstallPath = gnpmPath + `-${version}`
             writeFileSync(actualInstallPath, buffer)
-            symlinkSync(gnpmPath, actualInstallPath)
         } catch (err) {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists.`);
+        }
+        try {
+            symlinkSync(gnpmPath, actualInstallPath)
+        } catch (err: any) {
+            setFailed(`Failed to create symlink for gnpm version ${version}.` + err.toString());
         }
     }
 }
