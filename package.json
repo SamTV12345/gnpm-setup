@@ -1,0 +1,23 @@
+{
+  "name": "gnpm-setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:ncc": "ncc build --minify --no-source-map-register --no-cache dist/tsc/index.js --out dist/",
+    "build": "tsc && pnpm run build:ncc",
+    "start": "pnpm run build && sh ./run.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.4",
+    "@types/node": "^24.6.2"
+  },
+  "packageManager": "pnpm@10.11.0"
+}
