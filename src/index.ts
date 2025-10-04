@@ -34,19 +34,20 @@ const main = async () => {
            createReadStream(tarFileLocation).pipe(createGunzip()).pipe(tar.extract(tarFileTargetLocation))
                .on('finish', ()=>{
                    console.log('Finished gnpm binary done.')
+                   copyFileSync(`${tarFileTargetLocation}/gnpm`, actualInstallPath);
+                   try {
+                       symlinkSync(actualInstallPath, gnpmPath)
+                       console.log(`Successfully installed gnpm version ${version}.`)
+                   } catch (err: any) {
+                       setFailed(`Failed to create symlink for gnpm version ${version}.` + err.toString());
+                   }
                });
 
-            copyFileSync(`${tarFileTargetLocation}/gnpm`, actualInstallPath);
 
         } catch (err: any) {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists. ${err.toString()}`);
         }
-        try {
-            symlinkSync(actualInstallPath, gnpmPath)
-            console.log(`Successfully installed gnpm version ${version}.`)
-        } catch (err: any) {
-            setFailed(`Failed to create symlink for gnpm version ${version}.` + err.toString());
-        }
+
     }
 }
 
