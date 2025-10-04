@@ -2,6 +2,7 @@ import {setFailed, saveState, getInput} from '@actions/core'
 import {createReadStream, existsSync, symlinkSync, writeFileSync, copyFileSync} from 'node:fs'
 import tar from 'tar-fs'
 const gnpmPath = '/usr/local/bin/gnpm';
+import { createGunzip } from 'node:zlib';
 
 const version = getInput('version', {required: true});
 
@@ -30,7 +31,10 @@ const main = async () => {
                 mode: 0o755
             })
 
-           createReadStream(tarFileLocation).pipe(tar.extract(tarFileTargetLocation));
+           createReadStream(tarFileLocation).pipe(createGunzip()).pipe(tar.extract(tarFileTargetLocation))
+               .on('finish', ()=>{
+                   console.log('Finished gnpm binary done.')
+               });
 
             copyFileSync(`${tarFileTargetLocation}/gnpm`, actualInstallPath);
 
