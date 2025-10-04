@@ -2,7 +2,7 @@ import {setFailed, saveState, getInput, addPath} from '@actions/core'
 import {createReadStream, existsSync, symlinkSync, writeFileSync, mkdirSync, copyFileSync} from 'node:fs'
 import tar from 'tar-fs'
 import {tmpdir} from "node:os";
-import {join} from "node:path";
+import {join, dirname} from "node:path";
 let gnpmPath: PathLike;
 
 if (process.platform === 'win32') {
@@ -21,7 +21,8 @@ import { PathLike } from "fs";
 
 const version = getInput('version', {required: true});
 
-
+const filename = process.platform === 'win32' ? 'gnpm.exe' : 'gnpm';
+const versionedFilename = `gnpm-${version}${process.platform === 'win32' ? '.exe' : ''}`;
 
 const main = async () => {
     const arch = process.arch === 'x64' ? 'amd64' : process.arch;
@@ -29,7 +30,7 @@ const main = async () => {
     const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${platform}_${arch}.tar.gz`
     const tarFileLocation = join(tmpdir(), "gnpm.tar.gz")
     const tarFileTargetLocation = join(tmpdir(),"gnpmTarget")
-    const actualInstallPath = gnpmPath + `-${version}`
+    const actualInstallPath = join(dirname(gnpmPath), versionedFilename);
 
     if (existsSync(actualInstallPath)) {
         console.log("Using cached gnpm binary")
@@ -52,7 +53,7 @@ const main = async () => {
            createReadStream(tarFileLocation).pipe(createGunzip()).pipe(tar.extract(tarFileTargetLocation))
                .on('finish', ()=>{
                    console.log('Finished gnpm binary done.')
-                   copyFileSync(join(tarFileTargetLocation, 'gnpm'), actualInstallPath);
+                   copyFileSync(join(tarFileTargetLocation, filename), actualInstallPath);
                    try {
                        symlinkSync(actualInstallPath, gnpmPath)
                        console.log(`Successfully installed gnpm version ${version}.`)
