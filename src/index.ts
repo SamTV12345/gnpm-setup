@@ -7,7 +7,8 @@ const version = getInput('version', {required: true});
 
 
 const main = async () => {
-    const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${process.platform}_${process.arch}.tar.gz`
+    const arch = process.arch === 'x64' ? 'amd64' : process.arch;
+    const link = `https://github.com/SamTV12345/gnpm/releases/download/v${version}/gnpm_${version}_${process.platform}_${arch}.tar.gz`
     console.log('Fetching gnpm version from', link);
 
     if (existsSync(gnpmPath)) {
