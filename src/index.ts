@@ -24,12 +24,15 @@ const main = async () => {
             const arrayBuffer = await gnpmBinary.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             saveState('gnpmPath', gnpmPath);
-            writeFileSync(actualInstallPath, buffer)
+            writeFileSync(actualInstallPath, buffer, {
+                mode: 0o755
+            })
         } catch (err) {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists.`);
         }
         try {
             symlinkSync(actualInstallPath, gnpmPath)
+            console.log(`Successfully installed gnpm version ${version}.`)
         } catch (err: any) {
             setFailed(`Failed to create symlink for gnpm version ${version}.` + err.toString());
         }
