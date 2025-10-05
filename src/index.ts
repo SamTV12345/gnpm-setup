@@ -1,5 +1,5 @@
 import {setFailed, saveState, getInput, addPath} from '@actions/core'
-import {createReadStream, existsSync, symlinkSync, writeFileSync, mkdirSync, copyFileSync} from 'node:fs'
+import {createReadStream, existsSync, symlinkSync, writeFileSync, mkdirSync, copyFileSync, unlinkSync, rmSync} from 'node:fs'
 import tar from 'tar-fs'
 import {tmpdir} from "node:os";
 import {join, dirname} from "node:path";
@@ -41,7 +41,7 @@ const main = async () => {
             const gnpmBinary =  await fetch(link)
             if (!gnpmBinary.ok) {
                 setFailed('Failed to fetch gnpm binary. Please check if the version exists.');
-                return;
+                process.exit(1)
             }
             const arrayBuffer = await gnpmBinary.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
@@ -55,6 +55,15 @@ const main = async () => {
                    console.log('Finished gnpm binary done.')
                    copyFileSync(join(tarFileTargetLocation, filename), actualInstallPath);
                    try {
+                       if (existsSync(gnpmPath)) {
+                            console.log(`Removing old gnpm symlink at ${gnpmPath}`);
+                            if (process.platform === 'win32') {
+                                unlinkSync(gnpmPath);
+                            }
+                            else {
+                                rmSync(gnpmPath);
+                            }
+                       }
                        symlinkSync(actualInstallPath, gnpmPath)
                        console.log(`Successfully installed gnpm version ${version}.`)
                    } catch (err: any) {
@@ -66,7 +75,6 @@ const main = async () => {
         } catch (err: any) {
             setFailed(`Failed to fetch gnpm version ${version}. Please check if the version exists. ${err.toString()}`);
         }
-
     }
 }
 
